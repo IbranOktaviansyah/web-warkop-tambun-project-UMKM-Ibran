@@ -3,36 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"content="upgrade-insecure-requests">
     <title>Edit Menu - Warkop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        body { display: flex; min-height: 100vh; background-color: #f7f7f7; }
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-        /* SIDEBAR */
-        .sidebar {
-            width: 220px;
-            background-color: #fff;
-            border-right: 1px solid #ddd;
-            padding: 20px 0;
+        body {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
         }
-        .profile { text-align: center; margin-bottom: 20px; }
-        .profile-icon {
-            width: 60px; height: 60px; border-radius: 50%;
-            background-color: #e7e3ff; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; color: #6b46c1; margin: 0 auto 10px;
-        }
-        .profile h3 { font-size: 14px; font-weight: 600; color: #333; }
-        .sidebar ul { list-style: none; width: 100%; }
-        .sidebar ul li { padding: 12px 25px; font-size: 14px; color: #333; cursor: pointer; transition: background 0.2s; }
-        .sidebar ul li:hover, .sidebar ul li.active { background-color: #f2f2f2; font-weight: bold; }
-        .sidebar ul li a { color: inherit; text-decoration: none; display: block; }
 
-        /* MAIN */
-        .main { flex: 1; padding: 25px 40px; }
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            flex: 1;
+            padding: 25px 40px;
+            margin-left: 220px; /* ruang untuk sidebar */
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Toggle Button */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #6b46c1;
+            color: #fff;
+            border: none;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Header */
         .header {
             background-color: #f9f9f9;
             padding: 20px 25px;
@@ -41,8 +55,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .header h1 { font-size: 20px; color: #111; }
+
+        .header h1 {
+            font-size: 20px;
+            color: #111;
+        }
+
         .header a {
             background-color: #111;
             color: #fff;
@@ -51,17 +72,31 @@
             border-radius: 6px;
             font-size: 14px;
         }
-        .header a:hover { background-color: #333; }
 
-        /* FORM */
+        .header a:hover {
+            background-color: #333;
+        }
+
+        /* ===== FORM ===== */
         .form-container {
             background-color: #fff;
             padding: 25px 35px;
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 14px; font-weight: bold; color: #333; margin-bottom: 6px; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
         input, select, textarea {
             width: 100%;
             padding: 8px 10px;
@@ -69,9 +104,23 @@
             border: 1px solid #ccc;
             font-size: 14px;
         }
-        textarea { resize: vertical; min-height: 80px; }
-        input:focus, select:focus, textarea:focus { border-color: #6b46c1; outline: none; }
-        .error-message { color: red; font-size: 13px; margin-top: 4px; display: none; }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #6b46c1;
+            outline: none;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
 
         img.preview {
             width: 100px;
@@ -80,7 +129,11 @@
             border: 1px solid #ccc;
         }
 
-        .form-footer { text-align: right; margin-top: 20px; }
+        .form-footer {
+            text-align: right;
+            margin-top: 20px;
+        }
+
         button {
             background-color: #111;
             color: #fff;
@@ -90,26 +143,90 @@
             cursor: pointer;
             font-size: 15px;
         }
-        button:hover { background-color: #333; }
 
-        @media (max-width: 768px) {
-            .main { padding: 20px; }
-            .form-container { padding: 20px; }
+        button:hover {
+            background-color: #333;
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #e7ffe7;
+            color: #0a660a;
+        }
+
+        .alert-error {
+            background: #ffe7e7;
+            color: #a00;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .header a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            img.preview {
+                width: 100%;
+                max-width: 250px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR -->
+    <!-- 🔹 TOGGLE BUTTON -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- 🔹 SIDEBAR -->
     @include('layouts.sidebar')
 
-    <!-- MAIN -->
+    <!-- 🔹 MAIN CONTENT -->
     <div class="main">
         <div class="header">
             <h1>Edit Menu: {{ $product->nama_produk }}</h1>
         </div>
 
         <div class="form-container">
+            {{-- Notifikasi --}}
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-error">{{ implode(', ', $errors->all()) }}</div>
+            @endif
+
             <form id="menuEditForm" action="{{ route('menu.update', $product->id_produk) }}" method="POST" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
@@ -168,6 +285,13 @@
     </div>
 
 <script>
+    // 🔸 Fungsi toggle sidebar
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('show');
+    }
+
+    // 🔸 Validasi manual sebelum submit
     document.getElementById('menuEditForm').addEventListener('submit', function(e) {
         let isValid = true;
         const form = e.target;
@@ -176,12 +300,10 @@
         fields.forEach(field => {
             const errorMsg = field.parentElement.querySelector('.error-message');
             if (!field.value.trim()) {
-                field.classList.add('error-field');
                 field.style.borderColor = 'red';
                 if (errorMsg) errorMsg.style.display = 'block';
                 isValid = false;
             } else {
-                field.classList.remove('error-field');
                 field.style.borderColor = '#ccc';
                 if (errorMsg) errorMsg.style.display = 'none';
             }
@@ -190,5 +312,6 @@
         if (!isValid) e.preventDefault();
     });
 </script>
+
 </body>
 </html>

@@ -31,12 +31,12 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/pemesanan/create', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan/store', [PemesananController::class, 'store'])->name('pemesanan.store');
     Route::get('/pemesanan/show/{id}', [PemesananController::class, 'show'])->name('pemesanan.show');
+    Route::get('/pemesanan/{id}', [PemesananController::class, 'show'])->name('pemesanan.show');
     Route::post('/pemesanan/check-stok', [PemesananController::class, 'checkStok'])->name('pemesanan.checkStok');
 
     // === STOK (semua bisa lihat, tapi CRUD hanya admin) ===
     Route::get('/stok', [StokController::class, 'index'])->name('stok.index');
 
-    // --- Hanya ADMIN yang bisa akses create/edit/delete/history stok ---
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/stok/create', [StokController::class, 'create'])->name('stok.create');
         Route::post('/stok/baru', [StokController::class, 'storeBaru'])->name('stok.store.baru');
@@ -47,16 +47,14 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::get('/stok/history', [StokHistoryController::class, 'index'])->name('stok.history');
     });
 
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/resep', [\App\Http\Controllers\ResepController::class, 'index'])->name('resep.index');
-        Route::get('/resep/create', [\App\Http\Controllers\ResepController::class, 'create'])->name('resep.create');
-        Route::post('/resep/store', [\App\Http\Controllers\ResepController::class, 'store'])->name('resep.store');
-        Route::delete('/resep/{id}', [\App\Http\Controllers\ResepController::class, 'destroy'])->name('resep.destroy');
-    });
+    // === MENU ===
+    // Kasir & Admin boleh melihat daftar menu
+    Route::get('/menu', [MenuController::class, 'index'])
+        ->middleware('role:admin,kasir')
+        ->name('menu.index');
 
-    // === MENU (hanya ADMIN) ===
+    // Hanya Admin yang boleh CRUD menu
     Route::middleware(['role:admin'])->group(function () {
-        Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
         Route::get('/menu/create', [MenuController::class, 'create'])->name('menu.create');
         Route::post('/menu/store', [MenuController::class, 'store'])->name('menu.store');
         Route::get('/menu/edit/{id_produk}', [MenuController::class, 'edit'])->name('menu.edit');
@@ -64,9 +62,19 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::get('/menu/delete/{id_produk}', [MenuController::class, 'destroy'])->name('menu.delete');
     });
 
+    // === RESEP (hanya ADMIN) ===
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/resep', [ResepController::class, 'index'])->name('resep.index');
+        Route::get('/resep/create', [ResepController::class, 'create'])->name('resep.create');
+        Route::post('/resep/store', [ResepController::class, 'store'])->name('resep.store');
+        Route::delete('/resep/{id}', [ResepController::class, 'destroy'])->name('resep.destroy');
+    });
+
     // === LAPORAN KEUANGAN (hanya ADMIN) ===
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPDF'])->name('laporan.exportPDF');
+        Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.exportExcel');
     });
 
     // === STAFF (hanya ADMIN) ===

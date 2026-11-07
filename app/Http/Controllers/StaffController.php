@@ -14,8 +14,10 @@ class StaffController extends Controller
         $q = $request->input('q');
         $query = User::query();
 
-        $query->where('role', '!=', 'admin');
+        // 🔸 Jangan tampilkan akun yang sedang login
+        $query->where('id_users', '!=', auth()->id());
 
+        // 🔸 Jika ada pencarian
         if (!empty($q)) {
             $query->where(function ($sub) use ($q) {
                 $sub->where('nama_lengkap', 'like', "%$q%")
@@ -23,9 +25,9 @@ class StaffController extends Controller
             });
         }
 
-        $users = $query->orderBy('id', 'desc')->get();
+        $users = $query->orderBy('id_users', 'desc')->get();
 
-        return view('.staff.staff', compact('users', 'q'));
+        return view('staff.staff', compact('users', 'q'));
     }
 
     // 🔹 Halaman tambah staff
@@ -57,7 +59,7 @@ class StaffController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('staff.index');
+        return redirect()->route('staff.index')->with('success', 'Staff baru berhasil ditambah!');
     }
 
     // 🔹 Halaman edit staff
@@ -68,21 +70,21 @@ class StaffController extends Controller
     }
 
     // 🔹 Ubah status aktif/nonaktif staff
-public function toggleStatus($id)
-{
-    $user = User::findOrFail($id);
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
 
-    // Jangan ubah admin
-    if ($user->role === 'admin') {
-        return redirect()->route('staff.index')->with('error', 'Status akun admin tidak dapat diubah.');
+        // Jangan ubah admin
+        if ($user->role === 'admin') {
+            return redirect()->route('staff.index')->with('error', 'Status akun admin tidak dapat diubah.');
+        }
+
+        // Toggle status
+        $user->status = $user->status === 'aktif' ? 'nonaktif' : 'aktif';
+        $user->save();
+
+        return redirect()->route('staff.index')->with('success', 'Status staff berhasil diperbarui!');
     }
-
-    // Toggle status
-    $user->status = $user->status === 'aktif' ? 'nonaktif' : 'aktif';
-    $user->save();
-
-    return redirect()->route('staff.index')->with('success', 'Status staff berhasil diperbarui!');
-}
 
     // 🔹 Update staff
     public function update(Request $request, $id)
@@ -90,7 +92,9 @@ public function toggleStatus($id)
         $user = User::findOrFail($id);
 
         $request->validate([
-            'username' => 'required|unique:users,username,' . $id,
+            // PERBAIKAN KRITIS: Menambahkan parameter keempat 'id_users'
+            // Format: unique:tabel,kolom,nilai_id_yang_diabaikan,kolom_id
+            'username' => 'required|unique:users,username,' . $id . ',id_users', 
             'nama_lengkap' => 'required|string|max:100',
             'role' => 'required|in:kasir,admin',
             'email' => 'nullable|email|max:100',

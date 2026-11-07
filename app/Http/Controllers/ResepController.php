@@ -32,7 +32,7 @@ class ResepController extends Controller
     // === HAPUS RESEP ===
     public function destroy($id)
     {
-        DB::table('resep_produk')->where('id', $id)->delete();
+        DB::table('resep_produk')->where('id_resep', $id)->delete();
         return redirect()->route('resep.index')->with('success', 'Resep berhasil dihapus.');
     }
 

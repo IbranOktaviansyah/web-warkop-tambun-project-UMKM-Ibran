@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"content="upgrade-insecure-requests">
     <title>Halaman Login</title>
     <style>
         body {
@@ -53,6 +54,7 @@
         }
         .login-box input {
             width: 100%;
+            box-sizing: border-box; /* biar sejajar dengan .alert */
             padding: 8px;
             margin-bottom: 14px;
             border: 1px solid #ccc;
@@ -61,6 +63,7 @@
         }
         .login-box button {
             width: 100%;
+            box-sizing: border-box;
             padding: 9px;
             background-color: #222;
             color: #fff;
@@ -72,11 +75,14 @@
         .login-box button:hover { background-color: #444; }
 
         .alert {
+            display: block;
+            width: 100%;
             text-align: center;
             font-size: 13px;
             border-radius: 5px;
             padding: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            box-sizing: border-box; 
         }
         .alert.error {
             background-color: #ffecec;
